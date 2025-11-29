@@ -1,0 +1,50 @@
+# Gradle
+.gradle/
+build/
+
+# Wrapper JAR + properties
+!gradle/wrapper/gradle-wrapper.jar
+!gradle/wrapper/gradle-wrapper.properties
+
+# IntelliJ IDEA
+.idea/
+*.iws
+*.iml
+*.ipr
+out/
+
+# Kotlin
+.kotlin/
+
+# Eclipse
+.apt_generated/
+.classpath
+.factorypath
+.project
+.settings/
+.springBeans/
+.sts4-cache/
+bin/
+
+# NetBeans
+nbproject/private/
+nbbuild/
+dist/
+nbdist/
+.nb-gradle/
+
+# VS Code
+.vscode/
+
+# OS-specific
+# macOS Finder files
+.DS_Store
+# Windows thumbnail cache
+Thumbs.db
+
+# Logs
+*.log
+
+# Common IDE junk
+*.swp
+*.swo

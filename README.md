@@ -1,5 +1,5 @@
 # PostScript Kotlin Interpreter
-CPTS 355 - Programming Language Design - Itay Shemesh
+CPTS 355 - Programming Language Design
 
 ## Overview
 This project implements a simplified line-oriented PostScript interpreter written in **Kotlin** using **Gradle**.  

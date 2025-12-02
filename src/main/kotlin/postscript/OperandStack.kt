@@ -24,6 +24,7 @@ class OperandStack {
     fun isEmpty() = stack.isEmpty()
 
     // Typed helpers
+
     fun popNumberAsDouble(): Double {
         val v = pop()
         return when (v) {

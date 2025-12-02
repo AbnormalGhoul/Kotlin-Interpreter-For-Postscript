@@ -34,7 +34,7 @@ class Interpreter(val lexical: Boolean = false) {
         dictStack.define(name, Value.PSName(name, executable = true))
     }
 
-    // Evaluate an incoming postscript.Value token (literal or executable name).
+    // Evaluate an incoming postscript.Value token (literal or executable name)
     fun evalToken(token: Value) {
         when (token) {
             is Value.PSInt, is Value.PSReal, is Value.PSBool, is Value.PSString, is Value.PSArray, is Value.PSDict -> {
@@ -80,11 +80,11 @@ class Interpreter(val lexical: Boolean = false) {
         }
     }
 
-    // Execute a PSProc using current dictstack (dynamic semantics).
-    // The proc.tokens list contains token-lines which will each be parsed by the parser.
+    // Executes a PSProc using current dictstack (dynamic semantics)
+    // The proc.tokens list contains token-lines which will each be parsed by the parser
     fun executeProcedure(proc: Value.PSProc) {
         for (t in proc.tokens) {
-            // parseLine expects one token per line; tokens were created as trimmed lines
+            // parseLine expects one token per line
             val objs = parser.parseLine(t)
             for (o in objs) {
                 evalToken(o)
@@ -97,10 +97,10 @@ class Interpreter(val lexical: Boolean = false) {
     /**
      * Executes a PSProc using its captured lexical environment (proc.lexicalEnv)
      * Implementation approach:
-     *  - Save current dictstack snapshot
-     *  - Replace dictstack with proc.lexicalEnv snapshot
-     *  - Execute procedure
-     *  - Restore original dictstack
+     *  - Saves current dictstack snapshot
+     *  - Replaces dictstack with proc.lexicalEnv snapshot
+     *  - Executes procedure
+     *  - Restores original dictstack
      */
     fun executeProcedureWithLexicalEnv(proc: Value.PSProc) {
         val env = proc.lexicalEnv ?: throw PostScriptException("internal")
@@ -113,7 +113,7 @@ class Interpreter(val lexical: Boolean = false) {
         }
     }
 
-    // REPL: reads one token-per-line; parseLine returns Values (or empty) which are evaluated
+    // REPL: reads one token-per-line, parseLine returns Values (or empty) which are evaluated
     fun repl() {
         val reader = java.io.BufferedReader(java.io.InputStreamReader(System.`in`))
         requestQuit = false
@@ -123,7 +123,7 @@ class Interpreter(val lexical: Boolean = false) {
                 print(">> ")
                 System.out.flush()
 
-                val line = reader.readLine() ?: break  // EOF, means exit REPL
+                val line = reader.readLine() ?: break  // exit REPL
                 // Ignore empty lines (but still show next prompt)
                 val trimmed = line.trim()
                 if (trimmed.isEmpty()) {

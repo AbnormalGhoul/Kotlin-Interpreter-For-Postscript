@@ -15,7 +15,7 @@ sealed class Value {
     data class PSInt(val value: Long) : Value()
     data class PSReal(val value: Double) : Value()
     data class PSBool(val value: Boolean) : Value()
-    // `chars` is var so we make operator that can mutate string contents (when mutable==true)
+    // `chars` is var so we make an operator that can mutate string contents (when mutable==true)
     data class PSString(var chars: String, var mutable: Boolean = true) : Value()
     data class PSName(val name: String, val executable: Boolean = true) : Value()
     data class PSArray(val elements: MutableList<Value>) : Value()
@@ -31,7 +31,7 @@ sealed class Value {
     override fun toString(): String = when (this) {
         is PSInt -> value.toString()
         is PSReal -> {
-            // Avoid unnecessary decimal part when number is integral
+            // Avoids unnecessary decimal part when number is integral
             if (value % 1.0 == 0.0) value.toLong().toString() else value.toString()
         }
         is PSBool -> value.toString()

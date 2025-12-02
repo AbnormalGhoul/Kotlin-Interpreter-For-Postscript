@@ -14,15 +14,19 @@ import kotlin.math.*
 object Builtins {
     fun registerAll(interp: Interpreter) {
         // Basic stack operations
+
+        // Discards the top element of the operand stack
         interp.registerOperator("pop") { i ->
             i.operandStack.pop()
         }
 
+        // Duplicates the top element so there are two copies of it
         interp.registerOperator("dup") { i ->
             val top = i.operandStack.peek()
             i.operandStack.push(top)
         }
 
+        // Swaps the positions of the top two elements on the stack
         interp.registerOperator("exch") { i ->
             val a = i.operandStack.pop()
             val b = i.operandStack.pop()
@@ -30,20 +34,24 @@ object Builtins {
             i.operandStack.push(b)
         }
 
+        // Removes every item from the operand stack
         interp.registerOperator("clear") { i ->
             i.operandStack.clear()
         }
 
+        // Pushes an integer representing the number of items currently on the stack
         interp.registerOperator("count") { i ->
             i.operandStack.push(Value.PSInt(i.operandStack.count().toLong()))
         }
 
         // mark, cleartomark, counttomark
+        // Pushes a special "marker" object onto the stack used for grouping
         val MARK_NAME = "__MARK__"
         interp.registerOperator("mark") { i ->
             i.operandStack.push(Value.PSName(MARK_NAME, executable = false))
         }
 
+        // Pops and discards elements from the stack until it finds a marker
         interp.registerOperator("cleartomark") { i ->
             while (true) {
                 if (i.operandStack.isEmpty()) throw PostScriptException("unmatchedmark")
@@ -52,6 +60,7 @@ object Builtins {
             }
         }
 
+        // Pushes the number of items between the top of the stack and the first marker found
         interp.registerOperator("counttomark") { i ->
             var count = 0
             // traverse from top to bottom
@@ -63,6 +72,7 @@ object Builtins {
             i.operandStack.push(Value.PSInt(count.toLong()))
         }
 
+        // Copies the item found at depth n and pushes it to the top
         interp.registerOperator("index") { i ->
             val nVal = i.operandStack.pop()
             val n = when (nVal) {
@@ -76,6 +86,7 @@ object Builtins {
             i.operandStack.push(target)
         }
 
+        // Rotates a specific number of items on the stack by a given amount
         interp.registerOperator("roll") { i ->
             val jVal = i.operandStack.pop()
             val nVal = i.operandStack.pop()
@@ -106,7 +117,7 @@ object Builtins {
             for (v in rotated) i.operandStack.push(v)
         }
 
-        // copy: stack copy or array to array
+        // Duplicates the top n items of the stack, or copies values from one array to another
         interp.registerOperator("copy") { i ->
             val top = i.operandStack.pop()
             when (top) {
@@ -241,22 +252,27 @@ object Builtins {
         }
 
         // Dictionaries
+
+        // Creates an empty dictionary with a specified initial capacity
         interp.registerOperator("dict") { i ->
             val size = i.operandStack.popIntValue()
             val dict = Value.PSDict(mutableMapOf())
             i.operandStack.push(dict)
         }
 
+        // Pushes a dictionary onto the dictionary stack, making it the current active scope
         interp.registerOperator("begin") { i ->
             val d = i.operandStack.pop()
             if (d !is Value.PSDict) throw PostScriptException("typecheck")
             i.dictStack.begin(d)
         }
 
+        // Pops the top dictionary off the dictionary stack, restoring the previous scope
         interp.registerOperator("end") { i ->
             i.dictStack.end()
         }
 
+        // Defines a variable (key-value pair) in the current top-most dictionary
         interp.registerOperator("def") { i ->
             val value = i.operandStack.pop()
             val key = i.operandStack.pop()
@@ -277,6 +293,7 @@ object Builtins {
         }
 
 
+        // Specific variable name in the dictionary stack and updates its value
         interp.registerOperator("store") { i ->
             val value = i.operandStack.pop()
             val key = i.operandStack.pop()
@@ -284,6 +301,7 @@ object Builtins {
             i.dictStack.store(key.name, value)
         }
 
+        // Checks if a key exists in any active dictionary and returns that dictionary and a boolean
         interp.registerOperator("where") { i ->
             val keyval = i.operandStack.pop()
             if (keyval !is Value.PSName || keyval.executable) throw PostScriptException("typecheck")
@@ -297,6 +315,7 @@ object Builtins {
             }
         }
 
+        // Looks up a key in the dictionary stack and pushes its raw value (without executing it)
         interp.registerOperator("load") { i ->
             val key = i.operandStack.pop()
             if (key !is Value.PSName) throw PostScriptException("typecheck")
@@ -304,6 +323,7 @@ object Builtins {
             i.operandStack.push(v)
         }
 
+        // Checks if a specific dictionary object contains a specific key
         interp.registerOperator("known") { i ->
             val key = i.operandStack.pop()
             val d = i.operandStack.pop()
@@ -311,7 +331,7 @@ object Builtins {
             i.operandStack.push(Value.PSBool(d.map.containsKey(key.name)))
         }
 
-        // get, put for dicts, strings, arrays
+        // Retrieves a value from a container (array, string, or dict) using an index or key
         interp.registerOperator("get") { i ->
             val index = i.operandStack.pop()
             val container = i.operandStack.pop()
@@ -344,6 +364,7 @@ object Builtins {
             }
         }
 
+        // Stores a value into a container at a specific index or key
         interp.registerOperator("put") { i ->
             val value = i.operandStack.pop()
             val index = i.operandStack.pop()
@@ -383,6 +404,7 @@ object Builtins {
             }
         }
 
+        // Pushes the length of the given object onto the stack
         interp.registerOperator("length") { i ->
             val top = i.operandStack.pop()
             when (top) {
@@ -408,6 +430,7 @@ object Builtins {
             i.operandStack.push(s)
         }
 
+        // pushes all elements in an array onto the stack individually, followed by the array itself
         interp.registerOperator("aload") { i ->
             val arr = i.operandStack.pop()
             if (arr !is Value.PSArray) throw PostScriptException("typecheck")
@@ -415,6 +438,7 @@ object Builtins {
             i.operandStack.push(arr)
         }
 
+        // Fills an array with elements popped from the stack and pushes the modified array back
         interp.registerOperator("astore") { i ->
             val arr = i.operandStack.pop()
             if (arr !is Value.PSArray) throw PostScriptException("typecheck")
@@ -424,7 +448,7 @@ object Builtins {
             i.operandStack.push(arr)
         }
 
-        // forall on arrays, dicts
+        // Iterates through every item in an array or dictionary and executes a procedure for each one
         interp.registerOperator("forall") { i ->
             val procv = i.operandStack.pop()
             val arr = i.operandStack.pop()
